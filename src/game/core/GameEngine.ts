@@ -18,7 +18,7 @@ import { createEnemyWave, updateEnemy } from "../entities/enemies";
 import { createLifePowerUp, createPowerUp, updatePowerUp } from "../entities/powerUps";
 import { AudioSystem } from "../systems/audioSystem";
 import {
-  createEnemyProjectile,
+  createEnemyVolley,
   createPlayerProjectiles,
   updateProjectile,
 } from "../entities/projectiles";
@@ -55,6 +55,7 @@ export class GameEngine {
   private waveElapsed = 0;
   private bossIntroTimer = 0;
   private bossAttackIndex = 0;
+  private enemyAttackIndex = 0;
   private bossPowerUpTimer = 0;
   private lifeDropTimer = 0;
   private playerDeathTimer = 0;
@@ -124,6 +125,7 @@ export class GameEngine {
     this.waveElapsed = 0;
     this.bossIntroTimer = 0;
     this.bossAttackIndex = 0;
+    this.enemyAttackIndex = 0;
     this.bossPowerUpTimer = 0;
     this.lifeDropTimer = 35 + Math.random() * 20;
     this.playerDeathTimer = 0;
@@ -141,6 +143,7 @@ export class GameEngine {
       ? BOSS_INTRO_DURATION
       : 0;
     this.bossAttackIndex = 0;
+    this.enemyAttackIndex = 0;
     this.bossPowerUpTimer =
       this.waveIndex % 5 === 0 ? 7 + Math.random() * 3 : 0;
     this.store.set({ level: this.waveIndex });
@@ -289,39 +292,33 @@ export class GameEngine {
       const shotSpeed = 230 + Math.min(this.waveIndex * 9, 155);
       if (boss) {
         const healthRatio = boss.hp / boss.maxHp;
-        const attackIndex = this.bossAttackIndex % 5;
-        if (attackIndex === 4) {
+        const attackIndex = this.bossAttackIndex % 6;
+        if (attackIndex === 5) {
           this.bossAttackIndex += 1;
           this.enemyShotTimer = healthRatio < 0.5 ? 1.05 : 1.25;
         } else {
-          const aimedAngle = Math.atan2(
-            this.player.position.x - boss.position.x,
-            this.player.position.y - boss.position.y,
+          this.enemyProjectiles.push(
+            ...createEnemyVolley(
+              boss,
+              this.player.position,
+              shotSpeed + 50,
+              this.bossAttackIndex,
+            ),
           );
-          const pattern = this.bossAttackIndex % 4;
-          const spread =
-            pattern === 0
-              ? [-0.2, 0, 0.2]
-              : pattern === 1
-                ? [-0.8, -0.55, -0.3, -0.05, 0.2, 0.45, 0.7]
-                : pattern === 2
-                  ? [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1]
-                  : [-0.6, -0.3, 0, 0.3, 0.6];
-          const sweepOffset =
-            pattern === 3 ? Math.sin(this.bossAttackIndex * 0.9) * 0.45 : 0;
-          const angles = spread.map((offset) => aimedAngle + offset + sweepOffset);
-
-          for (const angle of angles) {
-            this.enemyProjectiles.push(
-              createEnemyProjectile(boss, angle, shotSpeed + 50),
-            );
-          }
           this.bossAttackIndex += 1;
           this.enemyShotTimer = healthRatio < 0.5 ? 0.42 : 0.62;
         }
       } else {
         const shooter = this.enemies[Math.floor(Math.random() * this.enemies.length)];
-        this.enemyProjectiles.push(createEnemyProjectile(shooter, 0, shotSpeed));
+        this.enemyProjectiles.push(
+          ...createEnemyVolley(
+            shooter,
+            this.player.position,
+            shotSpeed,
+            this.enemyAttackIndex,
+          ),
+        );
+        this.enemyAttackIndex += 1;
         this.enemyShotTimer = Math.max(
           0.22,
           0.58 + Math.random() * 0.42 - this.waveIndex * 0.035,

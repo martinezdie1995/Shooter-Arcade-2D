@@ -56,12 +56,16 @@
 - La música de `musica fondo.mp3` acompaña las oleadas normales y `bossfight.mp3` las
   oleadas de jefe; normalmente cambian con crossfade de 1.8 segundos. Al derrotar al jefe,
   la música normal reinicia inmediatamente, sin transición.
+- Al comenzar o reiniciar una partida, la música anterior se corta antes de iniciar
+  inmediatamente la pista del nivel correspondiente.
 - Al pausar, la pista activa de juego se desvanece y se usa `intro music.mp3` como tema
   tranquilo de pausa; al reanudar vuelve la música del nivel o del jefe.
 - Música al volumen máximo y efectos de sonido atenuados.
 - La dificultad sube con enemigos más veloces y disparos algo más frecuentes; el jefe
   se mueve más rápido y acelera sus ráfagas en fase crítica.
 - Solo los jefes muestran una barra de salud en canvas, debajo de su sprite.
+- Los ataques alternan entre disparos dirigidos, abanicos y ráfagas según el tipo de enemigo;
+  los jefes agregan barridos y pausas entre secuencias.
 - La aparición del jefe anuncia peligro durante 2,8 segundos con alerta pulsante y temblor
   visual decreciente; la música de la pelea continúa durante la presentación.
 - HUD, pausa y pantalla de fin de partida usan tipografía arcade condensada, contraste

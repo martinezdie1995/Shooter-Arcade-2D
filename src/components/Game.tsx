@@ -95,7 +95,7 @@ export function Game(): JSX.Element {
     musicFadeFrameRef.current = requestAnimationFrame(fade);
   }, []);
 
-  const switchMusicImmediately = useCallback((target: HTMLAudioElement): void => {
+  const switchMusicImmediately = useCallback((target: HTMLAudioElement | null): void => {
     if (musicFadeFrameRef.current !== null) {
       cancelAnimationFrame(musicFadeFrameRef.current);
       musicFadeFrameRef.current = null;
@@ -111,6 +111,11 @@ export function Game(): JSX.Element {
       track.pause();
       track.currentTime = 0;
       track.volume = 0;
+    }
+
+    if (!target) {
+      activeMusicRef.current = null;
+      return;
     }
 
     target.pause();
@@ -183,9 +188,20 @@ export function Game(): JSX.Element {
       previousSnapshot.level % 5 === 0 &&
       ui.gameState === "playing" &&
       ui.level === previousSnapshot.level + 1;
+    const runWasStarted =
+      (previousSnapshot.gameState === "menu" ||
+        previousSnapshot.gameState === "gameOver") &&
+      ui.gameState === "playing";
     const levelMusic = levelMusicRef.current;
     if (bossWasDefeated && menuMusicEnabled && levelMusic) {
       switchMusicImmediately(levelMusic);
+      return;
+    }
+
+    if (runWasStarted) {
+      const gameMusic =
+        ui.level % 5 === 0 ? bossMusicRef.current : levelMusic;
+      switchMusicImmediately(menuMusicEnabled ? gameMusic : null);
       return;
     }
 
