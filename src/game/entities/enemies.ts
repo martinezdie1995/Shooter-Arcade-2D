@@ -27,7 +27,9 @@ export function createEnemy(
 ): Enemy {
   const isBoss = kind === "boss";
   const isArmored = kind === "armored";
-  const size = { width: SHIP_WIDTH, height: SHIP_HEIGHT };
+  const size = isBoss
+    ? { width: 150, height: 138 }
+    : { width: SHIP_WIDTH, height: SHIP_HEIGHT };
   const baseSpeed = isBoss ? 0 : kind === "diver" ? 24 + level * 3.5 : 15 + level * 3;
   const maxHp = isBoss
     ? 200

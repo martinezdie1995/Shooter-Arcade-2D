@@ -39,10 +39,10 @@
   de descenso más dinámicos; sprite base fijo del jugador y variantes de enemigo;
   power-ups que mejoran carriles, disparos diagonales y cadencia; oleadas con enemigos que
   avanzan, intercambian posiciones y formaciones serpenteantes.
-- Todos los tipos de enemigo y el jugador usan cajas de render y colisión de 48×32 px,
-  compartidas mediante constantes de dominio; cada sprite mantiene su proporción original.
-  Las bajadas de enemigos normales y de oleadas especiales son cíclicas y están limitadas
-  antes de la línea del jugador.
+- El jugador y los enemigos normales usan cajas de render y colisión compartidas de
+  48×32 px; los jefes conservan su tamaño especial de 150×138 px. Cada sprite mantiene
+  su proporción original. Las bajadas de enemigos normales y de oleadas especiales son
+  cíclicas y están limitadas antes de la línea del jugador.
 - Power-up usa el sprite `src/assets/power up.png` con hitbox cuadrada de 32×32 px.
 - Las oleadas de jefe alternan los sprites `boss0.png` y `boss1.png`.
 - El jefe tiene 200 puntos de vida y movimiento rápido con patrones de abanico/ráfaga más densos;
