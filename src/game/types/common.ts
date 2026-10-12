@@ -2,6 +2,9 @@
 export const GAME_WIDTH = 480;
 /** Alto lógico del área de juego en píxeles. */
 export const GAME_HEIGHT = 640;
+/** Tamaño de render y colisión compartido por las naves. */
+export const SHIP_WIDTH = 48;
+export const SHIP_HEIGHT = 32;
 
 export type GameState = "menu" | "playing" | "paused" | "gameOver" | "victory";
 

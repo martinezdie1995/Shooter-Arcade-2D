@@ -1,8 +1,8 @@
 
 import type { Player } from "../types/entities";
-import { GAME_HEIGHT, GAME_WIDTH } from "../types/common";
-export const PLAYER_WIDTH = 42;
-export const PLAYER_HEIGHT = 28;
+import { GAME_HEIGHT, GAME_WIDTH, SHIP_HEIGHT, SHIP_WIDTH } from "../types/common";
+export const PLAYER_WIDTH = SHIP_WIDTH;
+export const PLAYER_HEIGHT = SHIP_HEIGHT;
 export const PLAYER_MAX_EVOLUTION = 4;
 export const PLAYER_SPEED = 260; // px/s
 export const PLAYER_MARGIN = 18; // margen contra los bordes

@@ -36,11 +36,13 @@
 - Fase 2 completa: disparo del jugador, proyectiles, enemigos básicos, movimiento de oleada,
   disparos enemigos, colisiones con AABB, puntuación, vidas y fin de partida funcional.
 - Fase 3 en progreso: enemigos tipo `basic` y `diver`; oleadas con variedad y patrones
-  de descenso más dinámicos; sprite base fijo del jugador y tres variantes de enemigo;
+  de descenso más dinámicos; sprite base fijo del jugador y variantes de enemigo;
   power-ups que mejoran carriles, disparos diagonales y cadencia; oleadas con enemigos que
   avanzan, intercambian posiciones y formaciones serpenteantes.
-- Los enemigos `basic` usan el sprite nuevo a 48×32 px; las bajadas de enemigos normales
-  y de oleadas especiales son cíclicas y están limitadas antes de la línea del jugador.
+- Todos los tipos de enemigo y el jugador usan cajas de render y colisión de 48×32 px,
+  compartidas mediante constantes de dominio; cada sprite mantiene su proporción original.
+  Las bajadas de enemigos normales y de oleadas especiales son cíclicas y están limitadas
+  antes de la línea del jugador.
 - Power-up usa el sprite `src/assets/power up.png` con hitbox cuadrada de 32×32 px.
 - Las oleadas de jefe alternan los sprites `boss0.png` y `boss1.png`.
 - El jefe tiene 200 puntos de vida y movimiento rápido con patrones de abanico/ráfaga más densos;

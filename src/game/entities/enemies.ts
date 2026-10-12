@@ -1,10 +1,8 @@
-import { GAME_HEIGHT, GAME_WIDTH } from "../types/common";
+import { GAME_HEIGHT, GAME_WIDTH, SHIP_HEIGHT, SHIP_WIDTH } from "../types/common";
 import type { Enemy, EnemyKind } from "../types/entities";
 
-export const ENEMY_WIDTH = 24;
-export const ENEMY_HEIGHT = 20;
-const BASIC_ENEMY_WIDTH = 48;
-const BASIC_ENEMY_HEIGHT = 32;
+export const ENEMY_WIDTH = SHIP_WIDTH;
+export const ENEMY_HEIGHT = SHIP_HEIGHT;
 const ENEMY_MAX_CENTER_Y = GAME_HEIGHT * 0.7;
 const ENEMY_MAX_DIVE = GAME_HEIGHT * 0.22;
 
@@ -29,11 +27,7 @@ export function createEnemy(
 ): Enemy {
   const isBoss = kind === "boss";
   const isArmored = kind === "armored";
-  const size = isBoss
-    ? { width: 150, height: 138 }
-    : kind === "basic"
-      ? { width: BASIC_ENEMY_WIDTH, height: BASIC_ENEMY_HEIGHT }
-      : { width: ENEMY_WIDTH, height: ENEMY_HEIGHT };
+  const size = { width: SHIP_WIDTH, height: SHIP_HEIGHT };
   const baseSpeed = isBoss ? 0 : kind === "diver" ? 24 + level * 3.5 : 15 + level * 3;
   const maxHp = isBoss
     ? 200
