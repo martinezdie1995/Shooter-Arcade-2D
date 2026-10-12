@@ -18,6 +18,7 @@ import bossMusicUrl from "../sounds/bossfight.mp3";
  * React aquí solo gestiona UI; el estado por frame vive en la clase GameEngine.
  */
 export function Game(): JSX.Element {
+  const gameFrameRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const menuMusicRef = useRef<HTMLAudioElement | null>(null);
   const pauseMusicRef = useRef<HTMLAudioElement | null>(null);
@@ -130,7 +131,7 @@ export function Game(): JSX.Element {
   }, []);
 
   const continueFromSplash = (): void => {
-    crossfadeMusic(menuMusicEnabled ? menuMusicRef.current : null);
+    switchMusicImmediately(menuMusicEnabled ? menuMusicRef.current : null);
     setShowCreatorSplash(false);
   };
 
@@ -165,11 +166,12 @@ export function Game(): JSX.Element {
     if (showCreatorSplash) return;
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const gameFrame = gameFrameRef.current;
+    if (!canvas || !gameFrame) return;
     canvas.width = GAME_WIDTH;
     canvas.height = GAME_HEIGHT;
 
-    const engine = new GameEngine(canvas, store);
+    const engine = new GameEngine(canvas, store, gameFrame);
     const unsubscribe = store.subscribe(setUi);
     engine.start();
 
@@ -247,7 +249,19 @@ export function Game(): JSX.Element {
 
   return (
     <div className="game-shell">
-      <div className="game-frame">
+      <div
+        ref={gameFrameRef}
+        className="game-frame"
+        onPointerDown={(event) => {
+          if (
+            !showCreatorSplash &&
+            (ui.gameState === "menu" || ui.gameState === "gameOver") &&
+            !(event.target instanceof Element && event.target.closest("button"))
+          ) {
+            store.dispatch("confirm");
+          }
+        }}
+      >
         <canvas ref={canvasRef} className="game-canvas" />
         <audio ref={menuMusicRef} src={menuMusicUrl} loop preload="auto" />
         <audio ref={pauseMusicRef} src={menuMusicUrl} loop preload="auto" />

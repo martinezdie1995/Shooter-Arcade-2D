@@ -8,10 +8,11 @@ import {
   drawBossHealthBar,
   drawBossWarning,
   drawEnemy,
+  drawEnemyProjectile,
   drawExplosion,
   drawPlayer,
+  drawPlayerProjectile,
   drawPowerUp,
-  drawProjectile,
 } from "../rendering/sprites";
 import { aabbOverlap, toAabb } from "../collision/collision";
 import { createEnemyWave, updateEnemy } from "../entities/enemies";
@@ -63,14 +64,18 @@ export class GameEngine {
   private pendingGameOver = false;
   private audio = new AudioSystem();
 
-  constructor(canvas: HTMLCanvasElement, store: GameStore) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    store: GameStore,
+    private touchTarget: HTMLElement,
+  ) {
     this.canvas = canvas;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Canvas 2D context not available");
     this.ctx = ctx;
     this.store = store;
     this.input.attach(window);
-    this.input.attachTouchTarget(canvas);
+    this.input.attachTouchTarget(touchTarget, canvas);
   }
 
   /** Inicia el loop. Idempotente: si ya corre, no hace nada. */
@@ -89,7 +94,7 @@ export class GameEngine {
       this.rafId = null;
     }
     this.input.detach(window);
-    this.input.detachTouchTarget(this.canvas);
+    this.input.detachTouchTarget(this.touchTarget);
     this.audio.destroy();
   }
 
@@ -252,9 +257,11 @@ export class GameEngine {
         {
           moveLeft: this.input.isDown("moveLeft"),
           moveRight: this.input.isDown("moveRight"),
+          moveUp: this.input.isDown("moveUp"),
+          moveDown: this.input.isDown("moveDown"),
         },
         dt,
-        this.input.getTouchPositionX(),
+        this.input.getTouchPosition(),
       );
     }
 
@@ -423,15 +430,23 @@ export class GameEngine {
         const { x, y } = this.playerDeathPosition;
         drawExplosion(ctx, { x: x - 30, y: y - 30, width: 60, height: 60 }, frame);
       } else {
-        drawPlayer(ctx, toAabb(this.player.position, this.player.size), this.player.evolution);
+        drawPlayer(ctx, toAabb(this.player.position, this.player.size));
       }
 
       for (const projectile of this.playerProjectiles) {
-        drawProjectile(ctx, toAabb(projectile.position, projectile.size), "#67e8f9");
+        drawPlayerProjectile(
+          ctx,
+          toAabb(projectile.position, projectile.size),
+          Math.atan2(projectile.velocity.y, projectile.velocity.x),
+        );
       }
 
       for (const projectile of this.enemyProjectiles) {
-        drawProjectile(ctx, toAabb(projectile.position, projectile.size), "#fbbf24");
+        drawEnemyProjectile(
+          ctx,
+          toAabb(projectile.position, projectile.size),
+          Math.atan2(projectile.velocity.y, projectile.velocity.x),
+        );
       }
 
       for (const enemy of this.enemies) {

@@ -1,5 +1,6 @@
 import type { GameAction } from "../types/common";
-import { GAME_WIDTH } from "../types/common";
+import type { Vec2 } from "../types/common";
+import { GAME_HEIGHT, GAME_WIDTH } from "../types/common";
 
 /**
  * Sistema de input independiente del dispositivo.
@@ -9,7 +10,8 @@ export class InputSystem {
   private pressed: Partial<Record<GameAction, boolean>> = {};
   private held = new Set<string>();
   private touchPointerId: number | null = null;
-  private touchPositionX: number | null = null;
+  private touchPosition: Vec2 | null = null;
+  private touchCanvas: HTMLCanvasElement | null = null;
   /** Acciones de "un solo disparo" (pulse) consumidas por el juego cada frame. */
   private justPressed: GameAction[] = [];
   private anyKeyPressed = false;
@@ -22,6 +24,12 @@ export class InputSystem {
       case "ArrowRight":
       case "KeyD":
         return "moveRight";
+      case "ArrowUp":
+      case "KeyW":
+        return "moveUp";
+      case "ArrowDown":
+      case "KeyS":
+        return "moveDown";
       case "KeyP":
       case "Escape":
         return "pause";
@@ -51,49 +59,55 @@ export class InputSystem {
     window.removeEventListener("blur", this.onBlur);
   }
 
-  attachTouchTarget(target: HTMLCanvasElement): void {
+  attachTouchTarget(target: HTMLElement, canvas: HTMLCanvasElement): void {
+    this.touchCanvas = canvas;
     target.addEventListener("pointerdown", this.onTouchStart);
     target.addEventListener("pointermove", this.onTouchMove);
     target.addEventListener("pointerup", this.onTouchEnd);
     target.addEventListener("pointercancel", this.onTouchEnd);
   }
 
-  detachTouchTarget(target: HTMLCanvasElement): void {
+  detachTouchTarget(target: HTMLElement): void {
     target.removeEventListener("pointerdown", this.onTouchStart);
     target.removeEventListener("pointermove", this.onTouchMove);
     target.removeEventListener("pointerup", this.onTouchEnd);
     target.removeEventListener("pointercancel", this.onTouchEnd);
+    this.touchCanvas = null;
   }
 
   private updateTouchPosition(event: PointerEvent): void {
-    const canvas = event.currentTarget;
-    if (!(canvas instanceof HTMLCanvasElement)) return;
+    const canvas = this.touchCanvas;
+    if (!canvas) return;
     const bounds = canvas.getBoundingClientRect();
-    if (bounds.width <= 0) return;
-    this.touchPositionX = Math.max(
-      0,
-      Math.min(1, (event.clientX - bounds.left) / bounds.width),
-    ) * GAME_WIDTH;
+    if (bounds.width <= 0 || bounds.height <= 0) return;
+    this.touchPosition = {
+      x: Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width)) * GAME_WIDTH,
+      y: Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height)) * GAME_HEIGHT,
+    };
   }
 
   private onTouchStart = (event: PointerEvent): void => {
     if (event.pointerType !== "touch" || this.touchPointerId !== null) return;
+    if (event.target instanceof Element && event.target.closest("button")) return;
     event.preventDefault();
     this.touchPointerId = event.pointerId;
     this.updateTouchPosition(event);
-    if (event.currentTarget instanceof HTMLCanvasElement) {
+    if (event.currentTarget instanceof HTMLElement) {
       event.currentTarget.setPointerCapture(event.pointerId);
     }
   };
 
   private onTouchMove = (event: PointerEvent): void => {
-    if (event.pointerId === this.touchPointerId) this.updateTouchPosition(event);
+    if (event.pointerId === this.touchPointerId) {
+      event.preventDefault();
+      this.updateTouchPosition(event);
+    }
   };
 
   private onTouchEnd = (event: PointerEvent): void => {
     if (event.pointerId !== this.touchPointerId) return;
     this.touchPointerId = null;
-    this.touchPositionX = null;
+    this.touchPosition = null;
   };
 
   private onKeyDown = (e: Event): void => {
@@ -123,7 +137,7 @@ export class InputSystem {
     this.justPressed.length = 0;
     this.anyKeyPressed = false;
     this.touchPointerId = null;
-    this.touchPositionX = null;
+    this.touchPosition = null;
   };
 
   /** ¿La acción está mantenida? (movimiento continuo) */
@@ -131,8 +145,8 @@ export class InputSystem {
     return this.pressed[action] === true;
   }
 
-  getTouchPositionX(): number | null {
-    return this.touchPositionX;
+  getTouchPosition(): Vec2 | null {
+    return this.touchPosition;
   }
 
   /** ¿La acción fue pulsada desde el último frame? (un solo disparo) */

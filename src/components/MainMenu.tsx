@@ -22,7 +22,7 @@ export function MainMenu({
         <strong>Derrota al jefe</strong>
       </p>
       <div className="menu-hint">
-        <p>Mover: ← →, A / D o desliza el dedo</p>
+        <p>Mover: flechas, W / A / S / D o desliza el dedo</p>
         <p>P / ESC: Pausa</p>
       </div>
       <button

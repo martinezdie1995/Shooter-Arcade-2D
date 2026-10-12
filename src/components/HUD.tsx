@@ -17,7 +17,7 @@ export function HUD({ snapshot }: { snapshot: UiSnapshot }): JSX.Element {
         <strong>{snapshot.level}</strong>
       </span>
       <span className="hud-stat">
-        <span className="hud-label">NAVE</span>
+        <span className="hud-label">DISPARO</span>
         <strong>{snapshot.evolution + 1}</strong>
       </span>
     </div>

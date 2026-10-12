@@ -2,10 +2,6 @@ import type { AABB } from "../collision/collision";
 import { GAME_WIDTH } from "../types/common";
 import type { EnemyKind, PowerUpKind } from "../types/entities";
 import player0Url from "../../assets/player0.png";
-import player1Url from "../../assets/player1.png";
-import player2Url from "../../assets/player2.png";
-import player3Url from "../../assets/player3.png";
-import player4Url from "../../assets/player4.png";
 import enemy0Url from "../../assets/enemy0.png";
 import enemy1Url from "../../assets/enemy1.png";
 import enemy2Url from "../../assets/enemy2.png";
@@ -16,6 +12,8 @@ import explosion0Url from "../../assets/explosion0.png";
 import explosion1Url from "../../assets/explosion1.png";
 import explosion2Url from "../../assets/explosion2.png";
 import explosion3Url from "../../assets/explosion3.png";
+import shotUrl from "../../assets/shot.png";
+import enemyShotUrl from "../../assets/shot-enemy.png";
 
 function loadSprite(source: string): HTMLImageElement {
   const image = new Image();
@@ -23,13 +21,7 @@ function loadSprite(source: string): HTMLImageElement {
   return image;
 }
 
-const playerSprites = [
-  player0Url,
-  player1Url,
-  player2Url,
-  player3Url,
-  player4Url,
-].map(loadSprite);
+const playerSprite = loadSprite(player0Url);
 const enemySprites: Record<Exclude<EnemyKind, "boss">, HTMLImageElement> = {
   basic: loadSprite(enemy0Url),
   diver: loadSprite(enemy1Url),
@@ -43,11 +35,29 @@ const explosionSprites = [
   explosion2Url,
   explosion3Url,
 ].map(loadSprite);
+const playerShotSprite = loadSprite(shotUrl);
+const enemyShotSprite = loadSprite(enemyShotUrl);
 
-export function drawPlayer(ctx: CanvasRenderingContext2D, box: AABB, evolution = 0): void {
-  const sprite = playerSprites[Math.min(evolution, playerSprites.length - 1)];
-  if (sprite.complete && sprite.naturalWidth > 0) {
-    ctx.drawImage(sprite, box.x, box.y, box.width, box.height);
+function drawContainedSprite(
+  ctx: CanvasRenderingContext2D,
+  sprite: HTMLImageElement,
+  box: AABB,
+): void {
+  const scale = Math.min(box.width / sprite.naturalWidth, box.height / sprite.naturalHeight);
+  const width = sprite.naturalWidth * scale;
+  const height = sprite.naturalHeight * scale;
+  ctx.drawImage(
+    sprite,
+    box.x + (box.width - width) / 2,
+    box.y + (box.height - height) / 2,
+    width,
+    height,
+  );
+}
+
+export function drawPlayer(ctx: CanvasRenderingContext2D, box: AABB): void {
+  if (playerSprite.complete && playerSprite.naturalWidth > 0) {
+    drawContainedSprite(ctx, playerSprite, box);
     return;
   }
 
@@ -79,6 +89,47 @@ export function drawProjectile(
   ctx.fillRect(box.x, box.y, box.width, box.height);
 }
 
+function drawDirectionalProjectile(
+  ctx: CanvasRenderingContext2D,
+  box: AABB,
+  sprite: HTMLImageElement,
+  color: string,
+  angle: number,
+): void {
+  if (!sprite.complete || sprite.naturalWidth === 0) {
+    drawProjectile(ctx, box, color);
+    return;
+  }
+
+  ctx.save();
+  ctx.translate(box.x + box.width / 2, box.y + box.height / 2);
+  ctx.rotate(angle);
+  ctx.drawImage(
+    sprite,
+    -box.height / 2,
+    -box.width / 2,
+    box.height,
+    box.width,
+  );
+  ctx.restore();
+}
+
+export function drawPlayerProjectile(
+  ctx: CanvasRenderingContext2D,
+  box: AABB,
+  angle: number,
+): void {
+  drawDirectionalProjectile(ctx, box, playerShotSprite, "#67e8f9", angle);
+}
+
+export function drawEnemyProjectile(
+  ctx: CanvasRenderingContext2D,
+  box: AABB,
+  angle: number,
+): void {
+  drawDirectionalProjectile(ctx, box, enemyShotSprite, "#fbbf24", angle);
+}
+
 export function drawEnemy(
   ctx: CanvasRenderingContext2D,
   box: AABB,
@@ -90,7 +141,7 @@ export function drawEnemy(
       ? bossSprites[bossVariant % bossSprites.length]
       : enemySprites[kind];
   if (sprite.complete && sprite.naturalWidth > 0) {
-    ctx.drawImage(sprite, box.x, box.y, box.width, box.height);
+    drawContainedSprite(ctx, sprite, box);
   } else {
     const cx = box.x + box.width / 2;
     const cy = box.y + box.height / 2;

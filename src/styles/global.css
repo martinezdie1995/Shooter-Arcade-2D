@@ -41,6 +41,7 @@ body {
   width: min(480px, 100vw, 75dvh);
   height: auto;
   aspect-ratio: 3 / 4;
+  touch-action: none;
 }
 
 .game-canvas {
@@ -369,12 +370,6 @@ body {
 @media (any-pointer: coarse) {
   .touch-controls {
     display: flex;
-  }
-}
-
-@media (max-width: 600px), (max-height: 600px) {
-  .menu-music-toggle {
-    display: none;
   }
 }
 

@@ -39,7 +39,7 @@ export function createPlayerProjectiles(player: Player): Projectile[] {
       x: player.position.x + x,
       y: player.position.y - player.size.height / 2 - 8,
     },
-    size: { width: 4, height: 12 },
+    size: { width: 6, height: 16 },
     velocity: {
       x: Math.sin(angle) * speed,
       y: -Math.cos(angle) * speed,

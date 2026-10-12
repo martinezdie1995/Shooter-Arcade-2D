@@ -28,5 +28,7 @@ export interface Entity {
 export type GameAction =
   | "moveLeft"
   | "moveRight"
+  | "moveUp"
+  | "moveDown"
   | "pause"
   | "confirm";

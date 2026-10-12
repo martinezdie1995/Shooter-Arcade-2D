@@ -8,8 +8,9 @@
 - `GameStore` (src/game/core/GameStore.ts) es un pub/sub mínimo que emite `UiSnapshot`
   a React solo cuando un valor visible cambia (nunca por frame).
 - `InputSystem` traduce teclado a acciones lógicas (`isDown` mantenidas,
-  `wasPressed` de una sola vez, limpiadas con `endFrame()`); también permite mover
-  al jugador siguiendo el dedo en el canvas y detecta cualquier tecla para iniciar o reiniciar.
+  `wasPressed` de una sola vez, limpiadas con `endFrame()`); permite movimiento en
+  ambos ejes con teclado o siguiendo el dedo por el marco del juego y detecta cualquier
+  tecla para iniciar o reiniciar.
 - `GameStore` conserva una cola breve de acciones de UI (`dispatch`/`consumeActions`)
   para que botones accesibles de inicio, pausa y reinicio soliciten acciones al engine.
 - Colisiones: AABB en src/game/collision/collision.ts; `position` de entidades = centro.
@@ -30,14 +31,14 @@
 ## Current State
 
 - Fase 1 completa: proyecto Vite+React+TS configurado, canvas adaptable, game loop, input,
-  jugador (movimiento horizontal con clamp), fondo con estrellas, HUD, menú, pausa (P/ESC),
+  jugador (movimiento horizontal y vertical con clamp), fondo con estrellas, HUD, menú, pausa (P/ESC),
   inicio y reinicio con cualquier tecla o botones; control táctil por seguimiento del dedo.
 - Fase 2 completa: disparo del jugador, proyectiles, enemigos básicos, movimiento de oleada,
   disparos enemigos, colisiones con AABB, puntuación, vidas y fin de partida funcional.
 - Fase 3 en progreso: enemigos tipo `basic` y `diver`; oleadas con variedad y patrones
-  de descenso más dinámicos; sprites propios para cinco evoluciones del jugador y tres
-  variantes de enemigo; power-ups de evolución que añaden carriles, disparos diagonales y
-  cadencia; oleadas con enemigos que avanzan, intercambian posiciones y formaciones serpenteantes.
+  de descenso más dinámicos; sprite base fijo del jugador y tres variantes de enemigo;
+  power-ups que mejoran carriles, disparos diagonales y cadencia; oleadas con enemigos que
+  avanzan, intercambian posiciones y formaciones serpenteantes.
 - Los enemigos `basic` usan el sprite nuevo a 48×32 px; las bajadas de enemigos normales
   y de oleadas especiales son cíclicas y están limitadas antes de la línea del jugador.
 - Power-up usa el sprite `src/assets/power up.png` con hitbox cuadrada de 32×32 px.
@@ -63,7 +64,10 @@
 - Música al volumen máximo y efectos de sonido atenuados.
 - La dificultad sube con enemigos más veloces y disparos algo más frecuentes; el jefe
   se mueve más rápido y acelera sus ráfagas en fase crítica.
-- Solo los jefes muestran una barra de salud en canvas, debajo de su sprite.
+- Solo los jefes muestran una barra de salud en canvas, debajo de su sprite. Los sprites
+  de naves y enemigos conservan su proporción dentro de sus cajas de render; el jugador
+  usa `src/assets/shot.png` y los enemigos `src/assets/shot-enemy.png`, rotados según
+  la dirección de cada proyectil.
 - Los ataques alternan entre disparos dirigidos, abanicos y ráfagas según el tipo de enemigo;
   los jefes agregan barridos y pausas entre secuencias.
 - La aparición del jefe anuncia peligro durante 2,8 segundos con alerta pulsante y temblor
