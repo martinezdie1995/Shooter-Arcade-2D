@@ -37,6 +37,8 @@ const explosionSprites = [
 ].map(loadSprite);
 const playerShotSprite = loadSprite(shotUrl);
 const enemyShotSprite = loadSprite(enemyShotUrl);
+const PROJECTILE_SPRITE_LENGTH = 38;
+const PROJECTILE_SPRITE_WIDTH = 15;
 
 function drawContainedSprite(
   ctx: CanvasRenderingContext2D,
@@ -106,10 +108,10 @@ function drawDirectionalProjectile(
   ctx.rotate(angle);
   ctx.drawImage(
     sprite,
-    -box.height / 2,
-    -box.width / 2,
-    box.height,
-    box.width,
+    -PROJECTILE_SPRITE_LENGTH / 2,
+    -PROJECTILE_SPRITE_WIDTH / 2,
+    PROJECTILE_SPRITE_LENGTH,
+    PROJECTILE_SPRITE_WIDTH,
   );
   ctx.restore();
 }
