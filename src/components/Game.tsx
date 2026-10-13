@@ -9,6 +9,7 @@ import { GameOverScreen } from "./GameOverScreen";
 import { CreatorSplash } from "./CreatorSplash";
 import { TouchControls } from "./TouchControls";
 import { Scoreboard } from "./Scoreboard";
+import { ShipSelect } from "./ShipSelect";
 import { loadScoreHistory, recordFinalScore, type ScoreRecord } from "../game/systems/scoreHistory";
 import { GAME_HEIGHT, GAME_WIDTH } from "../game/types/common";
 import menuMusicUrl from "../sounds/intro music.mp3";
@@ -31,6 +32,7 @@ export function Game(): JSX.Element {
   const [showCreatorSplash, setShowCreatorSplash] = useState(true);
   const [menuMusicEnabled, setMenuMusicEnabled] = useState(true);
   const [showScoreboard, setShowScoreboard] = useState(false);
+  const [showShipSelect, setShowShipSelect] = useState(false);
   const [scoreHistory, setScoreHistory] = useState<ScoreRecord[]>(() => loadScoreHistory());
   const [ui, setUi] = useState<UiSnapshot>({
     gameState: "menu",
@@ -38,6 +40,7 @@ export function Game(): JSX.Element {
     lives: 3,
     level: 1,
     evolution: 0,
+    selectedShip: "fighter",
   });
   const previousGameSnapshotRef = useRef({ gameState: ui.gameState, level: ui.level });
   const previousScoreStateRef = useRef(ui.gameState);
@@ -262,20 +265,7 @@ export function Game(): JSX.Element {
 
   return (
     <div className="game-shell">
-      <div
-        ref={gameFrameRef}
-        className="game-frame"
-        onPointerDown={(event) => {
-          if (
-            !showCreatorSplash &&
-            !showScoreboard &&
-            ui.gameState === "menu" &&
-            !(event.target instanceof Element && event.target.closest("button"))
-          ) {
-            store.dispatch("confirm");
-          }
-        }}
-      >
+      <div ref={gameFrameRef} className="game-frame">
         <canvas ref={canvasRef} className="game-canvas" />
         <audio ref={menuMusicRef} src={menuMusicUrl} loop preload="auto" />
         <audio ref={pauseMusicRef} src={menuMusicUrl} loop preload="auto" />
@@ -289,12 +279,22 @@ export function Game(): JSX.Element {
             {ui.gameState === "menu" && (
               showScoreboard ? (
                 <Scoreboard scores={scoreHistory} onBack={() => setShowScoreboard(false)} />
+              ) : showShipSelect ? (
+                <ShipSelect
+                  selectedShip={ui.selectedShip}
+                  onSelect={(shipId) => store.set({ selectedShip: shipId })}
+                  onBack={() => setShowShipSelect(false)}
+                  onStart={() => {
+                    setShowShipSelect(false);
+                    store.dispatch("confirm");
+                  }}
+                />
               ) : (
                 <MainMenu
                   menuMusicEnabled={menuMusicEnabled}
                   onToggleMenuMusic={toggleMenuMusic}
                   onShowScores={() => setShowScoreboard(true)}
-                  onStart={() => store.dispatch("confirm")}
+                  onStart={() => setShowShipSelect(true)}
                 />
               )
             )}

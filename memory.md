@@ -85,6 +85,9 @@
 - Al reiniciar después de perder, se cancela la secuencia de audio game-over/puntuación.
 - Al comenzar una partida, el input táctil inicial se limpia para conservar la posición
   predeterminada inferior de la nave.
+- El hangar previo al inicio permite elegir entre tres naves con velocidades, cadencias y
+  vidas iniciales distintas; sus sprites/disparos se ajustan al marco existente de 48×32 px
+  y sus configuraciones viven en `game/entities/playerShips.ts`.
 - Durante cada pelea de jefe pueden caer power-ups de evolución cada 8–11 segundos;
   aparecen mejoras de vida ocasionales durante la partida, con un máximo de cinco vidas.
 - Build verificado con `npm run build` sin errores.

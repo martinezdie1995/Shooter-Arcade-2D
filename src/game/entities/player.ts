@@ -1,19 +1,21 @@
 
 import type { Player } from "../types/entities";
 import { GAME_HEIGHT, GAME_WIDTH, SHIP_HEIGHT, SHIP_WIDTH } from "../types/common";
+import { getPlayerShip } from "./playerShips";
 export const PLAYER_WIDTH = SHIP_WIDTH;
 export const PLAYER_HEIGHT = SHIP_HEIGHT;
 export const PLAYER_MAX_EVOLUTION = 4;
-export const PLAYER_SPEED = 260; // px/s
 export const PLAYER_MARGIN = 18; // margen contra los bordes
 const PLAYER_VERTICAL_MARGIN = 24;
 const TOUCH_PLAYER_OFFSET_Y = 56;
 
-export function createPlayer(): Player {
+export function createPlayer(shipId: Player["shipId"] = "fighter"): Player {
+  const ship = getPlayerShip(shipId);
   return {
     position: { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 110 },
     size: { width: PLAYER_WIDTH, height: PLAYER_HEIGHT },
-    speed: PLAYER_SPEED,
+    speed: ship.speed,
+    shipId,
     evolution: 0,
   };
 }

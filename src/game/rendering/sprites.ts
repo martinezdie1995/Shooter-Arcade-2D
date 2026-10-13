@@ -1,7 +1,7 @@
 import type { AABB } from "../collision/collision";
 import { GAME_WIDTH } from "../types/common";
-import type { EnemyKind, PowerUpKind } from "../types/entities";
-import player0Url from "../../assets/player0.png";
+import type { EnemyKind, PlayerShipId, PowerUpKind } from "../types/entities";
+import { PLAYER_SHIPS, getPlayerShip } from "../entities/playerShips";
 import enemy0Url from "../../assets/enemy0.png";
 import enemy1Url from "../../assets/enemy1.png";
 import enemy2Url from "../../assets/enemy2.png";
@@ -12,7 +12,6 @@ import explosion0Url from "../../assets/explosion0.png";
 import explosion1Url from "../../assets/explosion1.png";
 import explosion2Url from "../../assets/explosion2.png";
 import explosion3Url from "../../assets/explosion3.png";
-import shotUrl from "../../assets/shot.png";
 import enemyShotUrl from "../../assets/shot-enemy.png";
 
 function loadSprite(source: string): HTMLImageElement {
@@ -21,7 +20,9 @@ function loadSprite(source: string): HTMLImageElement {
   return image;
 }
 
-const playerSprite = loadSprite(player0Url);
+const playerSprites = new Map(
+  PLAYER_SHIPS.map((ship) => [ship.id, loadSprite(ship.spriteUrl)]),
+);
 const enemySprites: Record<Exclude<EnemyKind, "boss">, HTMLImageElement> = {
   basic: loadSprite(enemy0Url),
   diver: loadSprite(enemy1Url),
@@ -35,10 +36,11 @@ const explosionSprites = [
   explosion2Url,
   explosion3Url,
 ].map(loadSprite);
-const playerShotSprite = loadSprite(shotUrl);
+const playerShotSprites = new Map(
+  PLAYER_SHIPS.map((ship) => [ship.id, loadSprite(ship.projectileUrl)]),
+);
 const enemyShotSprite = loadSprite(enemyShotUrl);
 const PROJECTILE_SPRITE_LENGTH = 38;
-const PROJECTILE_SPRITE_WIDTH = 15;
 
 function drawContainedSprite(
   ctx: CanvasRenderingContext2D,
@@ -57,9 +59,29 @@ function drawContainedSprite(
   );
 }
 
-export function drawPlayer(ctx: CanvasRenderingContext2D, box: AABB): void {
-  if (playerSprite.complete && playerSprite.naturalWidth > 0) {
-    drawContainedSprite(ctx, playerSprite, box);
+export function drawPlayer(
+  ctx: CanvasRenderingContext2D,
+  box: AABB,
+  shipId: PlayerShipId = "fighter",
+): void {
+  const ship = getPlayerShip(shipId);
+  const sprite = playerSprites.get(shipId);
+  if (sprite?.complete && sprite.naturalWidth > 0) {
+    if (!ship.rotated) {
+      drawContainedSprite(ctx, sprite, box);
+      return;
+    }
+
+    ctx.save();
+    ctx.translate(box.x + box.width / 2, box.y + box.height / 2);
+    ctx.rotate(-Math.PI / 2);
+    drawContainedSprite(ctx, sprite, {
+      x: -box.height / 2,
+      y: -box.width / 2,
+      width: box.height,
+      height: box.width,
+    });
+    ctx.restore();
     return;
   }
 
@@ -106,12 +128,14 @@ function drawDirectionalProjectile(
   ctx.save();
   ctx.translate(box.x + box.width / 2, box.y + box.height / 2);
   ctx.rotate(angle);
+  const spriteWidth =
+    (PROJECTILE_SPRITE_LENGTH * sprite.naturalHeight) / sprite.naturalWidth;
   ctx.drawImage(
     sprite,
     -PROJECTILE_SPRITE_LENGTH / 2,
-    -PROJECTILE_SPRITE_WIDTH / 2,
+    -spriteWidth / 2,
     PROJECTILE_SPRITE_LENGTH,
-    PROJECTILE_SPRITE_WIDTH,
+    spriteWidth,
   );
   ctx.restore();
 }
@@ -120,8 +144,11 @@ export function drawPlayerProjectile(
   ctx: CanvasRenderingContext2D,
   box: AABB,
   angle: number,
+  shipId: PlayerShipId = "fighter",
 ): void {
-  drawDirectionalProjectile(ctx, box, playerShotSprite, "#67e8f9", angle);
+  const sprite = playerShotSprites.get(shipId);
+  if (!sprite) throw new Error(`Falta el sprite de disparo para la nave: ${shipId}`);
+  drawDirectionalProjectile(ctx, box, sprite, "#67e8f9", angle);
 }
 
 export function drawEnemyProjectile(

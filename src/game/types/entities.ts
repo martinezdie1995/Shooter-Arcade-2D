@@ -7,7 +7,10 @@ export interface Ship {
   speed: number;
 }
 
+export type PlayerShipId = "fighter" | "interceptor" | "guardian";
+
 export interface Player extends Ship {
+  shipId: PlayerShipId;
   evolution: number;
 }
 

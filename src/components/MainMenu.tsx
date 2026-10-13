@@ -39,7 +39,7 @@ export function MainMenu({
         Ver puntuaciones
       </button>
       <button className="start-hint menu-start" type="button" onClick={onStart}>
-        Pulsa cualquier tecla o toca aquí para comenzar
+        Elegir nave y comenzar
       </button>
     </div>
   );

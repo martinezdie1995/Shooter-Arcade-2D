@@ -1,4 +1,5 @@
 import type { GameAction, GameState } from "../types/common";
+import type { PlayerShipId } from "../types/entities";
 
 /**
  * Datos visibles por la UI (React). Se emiten solo cuando cambian,
@@ -10,6 +11,7 @@ export interface UiSnapshot {
   lives: number;
   level: number;
   evolution: number;
+  selectedShip: PlayerShipId;
 }
 
 export type UiListener = (snapshot: UiSnapshot) => void;

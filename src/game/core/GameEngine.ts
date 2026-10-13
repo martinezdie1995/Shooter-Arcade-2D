@@ -18,6 +18,7 @@ import { aabbOverlap, toAabb } from "../collision/collision";
 import { createEnemyWave, updateEnemy } from "../entities/enemies";
 import { createLifePowerUp, createPowerUp, updatePowerUp } from "../entities/powerUps";
 import { AudioSystem } from "../systems/audioSystem";
+import { getPlayerShip } from "../entities/playerShips";
 import {
   createEnemyVolley,
   createPlayerProjectiles,
@@ -118,7 +119,9 @@ export class GameEngine {
   private resetRun(): void {
     this.audio.stopGameOver();
     this.input.clearTouchPosition();
-    this.player = createPlayer();
+    const selectedShip = this.store.get().selectedShip;
+    const ship = getPlayerShip(selectedShip);
+    this.player = createPlayer(selectedShip);
     this.playerProjectiles = [];
     this.enemyProjectiles = [];
     this.powerUps = [];
@@ -138,7 +141,13 @@ export class GameEngine {
     this.playerDeathPosition = null;
     this.pendingGameOver = false;
     this.spawnWave();
-    this.store.set({ gameState: "playing", score: 0, lives: 3, level: 1, evolution: 0 });
+    this.store.set({
+      gameState: "playing",
+      score: 0,
+      lives: ship.lives,
+      level: 1,
+      evolution: 0,
+    });
   }
 
   private spawnWave(): void {
@@ -181,10 +190,11 @@ export class GameEngine {
     }
 
     if (
-      (this.input.wasPressed("confirm") ||
-        this.input.wasAnyKeyPressed() ||
-        requestedActions.includes("confirm")) &&
-      (state === "menu" || state === "gameOver")
+      (state === "menu" && requestedActions.includes("confirm")) ||
+      (state === "gameOver" &&
+        (this.input.wasPressed("confirm") ||
+          this.input.wasAnyKeyPressed() ||
+          requestedActions.includes("confirm")))
     ) {
       this.resetRun();
     }
@@ -233,7 +243,7 @@ export class GameEngine {
           this.audio.playGameOver();
           return;
         }
-        this.player = createPlayer();
+        this.player = createPlayer(this.player.shipId);
       }
     }
 
@@ -290,7 +300,10 @@ export class GameEngine {
     this.autoFireCooldown -= dt;
     if (this.playerDeathTimer <= 0 && this.autoFireCooldown <= 0) {
       this.playerProjectiles.push(...createPlayerProjectiles(this.player));
-      this.autoFireCooldown = Math.max(0.14, 0.24 - this.player.evolution * 0.025);
+      this.autoFireCooldown = Math.max(
+        0.14,
+        getPlayerShip(this.player.shipId).fireRate - this.player.evolution * 0.025,
+      );
       this.audio.playShot();
     }
 
@@ -431,7 +444,7 @@ export class GameEngine {
         const { x, y } = this.playerDeathPosition;
         drawExplosion(ctx, { x: x - 30, y: y - 30, width: 60, height: 60 }, frame);
       } else {
-        drawPlayer(ctx, toAabb(this.player.position, this.player.size));
+        drawPlayer(ctx, toAabb(this.player.position, this.player.size), this.player.shipId);
       }
 
       for (const projectile of this.playerProjectiles) {
@@ -439,6 +452,7 @@ export class GameEngine {
           ctx,
           toAabb(projectile.position, projectile.size),
           Math.atan2(projectile.velocity.y, projectile.velocity.x),
+          this.player.shipId,
         );
       }
 
