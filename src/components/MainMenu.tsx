@@ -1,6 +1,7 @@
 interface MainMenuProps {
   menuMusicEnabled: boolean;
   onToggleMenuMusic: () => void;
+  onShowScores: () => void;
   onStart: () => void;
 }
 
@@ -8,6 +9,7 @@ interface MainMenuProps {
 export function MainMenu({
   menuMusicEnabled,
   onToggleMenuMusic,
+  onShowScores,
   onStart,
 }: MainMenuProps): JSX.Element {
   return (
@@ -32,6 +34,9 @@ export function MainMenu({
         aria-pressed={!menuMusicEnabled}
       >
         {menuMusicEnabled ? "Silenciar música" : "Activar música"}
+      </button>
+      <button className="menu-scores" type="button" onClick={onShowScores}>
+        Ver puntuaciones
       </button>
       <button className="start-hint menu-start" type="button" onClick={onStart}>
         Pulsa cualquier tecla o toca aquí para comenzar

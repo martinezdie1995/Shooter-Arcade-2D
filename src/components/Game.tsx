@@ -8,6 +8,8 @@ import { PauseMenu } from "./PauseMenu";
 import { GameOverScreen } from "./GameOverScreen";
 import { CreatorSplash } from "./CreatorSplash";
 import { TouchControls } from "./TouchControls";
+import { Scoreboard } from "./Scoreboard";
+import { loadScoreHistory, recordFinalScore, type ScoreRecord } from "../game/systems/scoreHistory";
 import { GAME_HEIGHT, GAME_WIDTH } from "../game/types/common";
 import menuMusicUrl from "../sounds/intro music.mp3";
 import levelMusicUrl from "../sounds/musica fondo.mp3";
@@ -28,6 +30,8 @@ export function Game(): JSX.Element {
   const musicFadeFrameRef = useRef<number | null>(null);
   const [showCreatorSplash, setShowCreatorSplash] = useState(true);
   const [menuMusicEnabled, setMenuMusicEnabled] = useState(true);
+  const [showScoreboard, setShowScoreboard] = useState(false);
+  const [scoreHistory, setScoreHistory] = useState<ScoreRecord[]>(() => loadScoreHistory());
   const [ui, setUi] = useState<UiSnapshot>({
     gameState: "menu",
     score: 0,
@@ -36,6 +40,7 @@ export function Game(): JSX.Element {
     evolution: 0,
   });
   const previousGameSnapshotRef = useRef({ gameState: ui.gameState, level: ui.level });
+  const previousScoreStateRef = useRef(ui.gameState);
 
   const store = useMemo(() => new GameStore(ui), []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -230,6 +235,14 @@ export function Game(): JSX.Element {
     ui.level,
   ]);
 
+  useEffect(() => {
+    const previousState = previousScoreStateRef.current;
+    previousScoreStateRef.current = ui.gameState;
+    if (previousState === "playing" && ui.gameState === "gameOver") {
+      setScoreHistory(recordFinalScore(ui.score));
+    }
+  }, [ui.gameState, ui.score]);
+
   useEffect(
     () => () => {
       if (musicFadeFrameRef.current !== null) {
@@ -255,7 +268,8 @@ export function Game(): JSX.Element {
         onPointerDown={(event) => {
           if (
             !showCreatorSplash &&
-            (ui.gameState === "menu" || ui.gameState === "gameOver") &&
+            !showScoreboard &&
+            ui.gameState === "menu" &&
             !(event.target instanceof Element && event.target.closest("button"))
           ) {
             store.dispatch("confirm");
@@ -273,11 +287,16 @@ export function Game(): JSX.Element {
           <>
             <HUD snapshot={ui} />
             {ui.gameState === "menu" && (
-              <MainMenu
-                menuMusicEnabled={menuMusicEnabled}
-                onToggleMenuMusic={toggleMenuMusic}
-                onStart={() => store.dispatch("confirm")}
-              />
+              showScoreboard ? (
+                <Scoreboard scores={scoreHistory} onBack={() => setShowScoreboard(false)} />
+              ) : (
+                <MainMenu
+                  menuMusicEnabled={menuMusicEnabled}
+                  onToggleMenuMusic={toggleMenuMusic}
+                  onShowScores={() => setShowScoreboard(true)}
+                  onStart={() => store.dispatch("confirm")}
+                />
+              )
             )}
             {ui.gameState === "playing" && (
               <TouchControls onPause={() => store.dispatch("pause")} />
@@ -288,6 +307,7 @@ export function Game(): JSX.Element {
             {ui.gameState === "gameOver" && (
               <GameOverScreen
                 score={ui.score}
+                scores={scoreHistory}
                 onRestart={() => store.dispatch("confirm")}
               />
             )}

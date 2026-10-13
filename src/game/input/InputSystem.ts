@@ -149,6 +149,10 @@ export class InputSystem {
     return this.touchPosition;
   }
 
+  clearTouchPosition(): void {
+    this.touchPosition = null;
+  }
+
   /** ¿La acción fue pulsada desde el último frame? (un solo disparo) */
   wasPressed(action: GameAction): boolean {
     return this.justPressed.includes(action);

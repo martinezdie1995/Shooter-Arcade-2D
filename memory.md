@@ -13,6 +13,9 @@
   tecla para iniciar o reiniciar.
 - `GameStore` conserva una cola breve de acciones de UI (`dispatch`/`consumeActions`)
   para que botones accesibles de inicio, pausa y reinicio soliciten acciones al engine.
+- El historial de puntuaciones finales se guarda en `localStorage`, se ordena en tabla
+  por puntaje y se muestra tanto al terminar como desde el menú; la tabla final conserva
+  el uso táctil sin disparar el reinicio por toques sobre filas.
 - Colisiones: AABB en src/game/collision/collision.ts; `position` de entidades = centro.
 - React (components/Game.tsx) solo monta canvas + engine en useEffect y renderiza
   overlays según `gameState`. El engine consulta el store; React no empuja estado al engine.
@@ -80,6 +83,8 @@
   al entrar a la pantalla final, `puntuacion final.mp3` se reproduce después del sonido
   de game over.
 - Al reiniciar después de perder, se cancela la secuencia de audio game-over/puntuación.
+- Al comenzar una partida, el input táctil inicial se limpia para conservar la posición
+  predeterminada inferior de la nave.
 - Durante cada pelea de jefe pueden caer power-ups de evolución cada 8–11 segundos;
   aparecen mejoras de vida ocasionales durante la partida, con un máximo de cinco vidas.
 - Build verificado con `npm run build` sin errores.

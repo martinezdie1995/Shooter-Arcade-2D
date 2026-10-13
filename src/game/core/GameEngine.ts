@@ -117,6 +117,7 @@ export class GameEngine {
 
   private resetRun(): void {
     this.audio.stopGameOver();
+    this.input.clearTouchPosition();
     this.player = createPlayer();
     this.playerProjectiles = [];
     this.enemyProjectiles = [];
