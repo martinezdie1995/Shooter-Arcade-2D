@@ -3,6 +3,7 @@ import type { Enemy, Player, Projectile } from "../types/entities";
 
 export const PLAYER_PROJECTILE_SPEED = 480;
 export const ENEMY_PROJECTILE_SPEED = 180;
+const TRACKING_TURN_RATE = 0.65;
 
 export function createPlayerProjectiles(player: Player): Projectile[] {
   const speed = PLAYER_PROJECTILE_SPEED;
@@ -136,21 +137,28 @@ export function updateProjectile(
   target?: Vec2,
 ): void {
   if (projectile.trackingTarget && target) {
-    const speed = Math.hypot(projectile.velocity.x, projectile.velocity.y);
-    if (speed > 0) {
-      const currentAngle = Math.atan2(projectile.velocity.y, projectile.velocity.x);
-      const targetAngle = Math.atan2(
-        target.y - projectile.position.y,
-        target.x - projectile.position.x,
-      );
-      const angleDifference = Math.atan2(
-        Math.sin(targetAngle - currentAngle),
-        Math.cos(targetAngle - currentAngle),
-      );
-      const turn = Math.max(-1.8 * dt, Math.min(1.8 * dt, angleDifference));
-      const nextAngle = currentAngle + turn;
-      projectile.velocity.x = Math.cos(nextAngle) * speed;
-      projectile.velocity.y = Math.sin(nextAngle) * speed;
+    if (projectile.position.y >= target.y) {
+      projectile.trackingTarget = false;
+    } else {
+      const speed = Math.hypot(projectile.velocity.x, projectile.velocity.y);
+      if (speed > 0) {
+        const currentAngle = Math.atan2(projectile.velocity.y, projectile.velocity.x);
+        const targetAngle = Math.atan2(
+          target.y - projectile.position.y,
+          target.x - projectile.position.x,
+        );
+        const angleDifference = Math.atan2(
+          Math.sin(targetAngle - currentAngle),
+          Math.cos(targetAngle - currentAngle),
+        );
+        const turn = Math.max(
+          -TRACKING_TURN_RATE * dt,
+          Math.min(TRACKING_TURN_RATE * dt, angleDifference),
+        );
+        const nextAngle = currentAngle + turn;
+        projectile.velocity.x = Math.cos(nextAngle) * speed;
+        projectile.velocity.y = Math.sin(nextAngle) * speed;
+      }
     }
   }
 

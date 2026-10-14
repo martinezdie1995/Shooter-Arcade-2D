@@ -563,6 +563,118 @@ body {
   }
 }
 
+@media (min-width: 700px) and (pointer: fine) {
+  .hud {
+    padding: 13px 12px;
+  }
+
+  .hud-score strong,
+  .hud-stat strong,
+  .hud-lives strong {
+    font-size: 20px;
+  }
+
+  .hud-label {
+    font-size: 12px;
+  }
+
+  .menu-kicker {
+    font-size: 13px;
+  }
+
+  .title.title-hero {
+    font-size: clamp(72px, 11vw, 112px);
+  }
+
+  .menu-subtitle {
+    font-size: 19px;
+  }
+
+  .menu-subtitle strong {
+    font-size: 26px;
+  }
+
+  .main-menu .menu-hint {
+    font-size: 14px;
+  }
+
+  .menu-music-toggle,
+  .menu-scores {
+    font-size: 14px;
+  }
+
+  .main-menu .start-hint {
+    font-size: 17px;
+  }
+
+  .ship-select-title {
+    font-size: 44px;
+  }
+
+  .ship-select-subtitle {
+    font-size: 13px;
+  }
+
+  .ship-card-image {
+    height: 76px;
+  }
+
+  .ship-card-image img.ship-card-sprite-rotated {
+    width: 76px;
+    max-height: 76px;
+  }
+
+  .ship-card-name {
+    font-size: 16px;
+  }
+
+  .ship-card-class {
+    font-size: 11px;
+  }
+
+  .ship-card-description {
+    font-size: 11px;
+  }
+
+  .ship-stat-heading,
+  .ship-stat-heading strong {
+    font-size: 10px;
+  }
+
+  .ship-back,
+  .ship-start {
+    font-size: 13px;
+  }
+
+  .pause-hint {
+    font-size: 16px;
+  }
+
+  .game-over-kicker {
+    font-size: 13px;
+  }
+
+  .game-over-title {
+    font-size: clamp(44px, 9vw, 58px);
+  }
+
+  .final-score-label {
+    font-size: 14px;
+  }
+
+  .final-score-value {
+    font-size: 58px;
+  }
+
+  .game-over-hint {
+    font-size: 14px;
+  }
+
+  .score-table {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 320px) {
   .hud {
     gap: 3px;

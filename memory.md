@@ -76,7 +76,8 @@
   la dirección de cada proyectil.
 - Los ataques varían por tipo: básicos disparan recto o en abanico, buzos lanzan proyectiles
   perseguidores o ráfagas rápidas, y blindados disparan abanicos lentos; el jefe combina
-  salvas reducidas con barridos y pausas entre secuencias.
+  salvas reducidas con barridos y pausas entre secuencias. Los proyectiles perseguidores giran
+  lentamente y dejan de seguir al jugador al cruzar su altura.
 - La aparición del jefe anuncia peligro durante 2,8 segundos con alerta pulsante y temblor
   visual decreciente; la música de la pelea continúa durante la presentación.
 - HUD, pausa y pantalla de fin de partida usan tipografía arcade condensada, contraste
@@ -92,6 +93,8 @@
   verticalmente. El hangar previo al inicio permite elegir entre tres naves con velocidades,
   cadencias y vidas iniciales distintas; la caja de render del jugador es de 54×36 px y sus
   configuraciones viven en `game/entities/playerShips.ts`.
+- Los textos del menú y hangar aumentan de tamaño en pantallas de ordenador para facilitar
+  su lectura.
 - Durante cada pelea de jefe pueden caer power-ups de evolución cada 8–11 segundos;
   aparecen mejoras de vida ocasionales durante la partida, con un máximo de cinco vidas.
 - Build verificado con `npm run build` sin errores.
