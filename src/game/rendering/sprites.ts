@@ -76,10 +76,10 @@ export function drawPlayer(
     ctx.translate(box.x + box.width / 2, box.y + box.height / 2);
     ctx.rotate(-Math.PI / 2);
     drawContainedSprite(ctx, sprite, {
-      x: -box.height / 2,
-      y: -box.width / 2,
-      width: box.height,
-      height: box.width,
+      x: -box.width / 2,
+      y: -box.height / 2,
+      width: box.width,
+      height: box.height,
     });
     ctx.restore();
     return;

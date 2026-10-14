@@ -30,14 +30,15 @@ export function createEnemy(
   const size = isBoss
     ? { width: 150, height: 138 }
     : { width: SHIP_WIDTH, height: SHIP_HEIGHT };
-  const baseSpeed = isBoss ? 0 : kind === "diver" ? 24 + level * 3.5 : 15 + level * 3;
+  const baseSpeed = isBoss ? 0 : kind === "diver" ? 28 + level * 5 : 15 + level * 4.2;
+  const difficultyTier = Math.min(3, Math.floor((level - 1) / 5));
   const maxHp = isBoss
-    ? 200
+    ? 200 + Math.max(0, Math.floor(level / 5) - 1) * 40
     : isArmored
-      ? 4
+      ? 4 + Math.min(2, Math.floor((level - 1) / 10))
       : kind === "diver"
-        ? 3
-        : 2;
+        ? 3 + Math.min(2, Math.floor((level - 1) / 10))
+        : 2 + difficultyTier;
 
   return {
     position: { x, y },
@@ -115,13 +116,30 @@ export function updateEnemy(
   enemy.hitCooldown = Math.max(0, enemy.hitCooldown - dt);
 
   if (enemy.kind === "boss") {
-    const horizontalMotion =
-      Math.sin(waveTime * 2.1) * 155 + Math.sin(waveTime * 4.1) * 30;
+    const encounter = Math.max(0, Math.floor(level / 5) - 1);
+    const speedScale = 1 + Math.min(encounter, 4) * 0.12;
+    let x: number;
+    let y: number;
+
+    if (enemy.bossVariant === 0) {
+      x =
+        GAME_WIDTH / 2 +
+        Math.sin(waveTime * 1.8 * speedScale) * 145 +
+        Math.sin(waveTime * 3.6 * speedScale) * 25;
+      y = 108 + Math.sin(waveTime * 2.4 * speedScale) * 17;
+    } else {
+      x =
+        GAME_WIDTH / 2 +
+        Math.sin(waveTime * 1.15 * speedScale) * 112 +
+        Math.sin(waveTime * 2.3 * speedScale) * 28;
+      y = 116 + Math.sin(waveTime * 1.7 * speedScale) * 36;
+    }
+
     enemy.position.x = Math.max(
       enemy.size.width / 2,
-      Math.min(GAME_WIDTH - enemy.size.width / 2, GAME_WIDTH / 2 + horizontalMotion),
+      Math.min(GAME_WIDTH - enemy.size.width / 2, x),
     );
-    enemy.position.y = 108 + Math.sin(waveTime * 3.2) * 21 + Math.sin(waveTime * 5.8) * 7;
+    enemy.position.y = y;
     return;
   }
 

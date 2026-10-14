@@ -319,24 +319,35 @@ export class GameEngine {
     if (this.bossIntroTimer <= 0) this.enemyShotTimer -= dt;
     if (this.bossIntroTimer <= 0 && this.enemyShotTimer <= 0 && this.enemies.length > 0) {
       const boss = this.enemies.find((enemy) => enemy.kind === "boss");
-      const shotSpeed = 230 + Math.min(this.waveIndex * 9, 155);
+      const shotSpeed = 215 + Math.min(this.waveIndex * 14, 250);
       if (boss) {
         const healthRatio = boss.hp / boss.maxHp;
-        const attackIndex = this.bossAttackIndex % 4;
-        if (attackIndex === 3) {
+        const cycleLength = 5;
+        const attackIndex = this.bossAttackIndex % cycleLength;
+        const restIndex = cycleLength - 1;
+        if (attackIndex === restIndex) {
           this.bossAttackIndex += 1;
-          this.enemyShotTimer = healthRatio < 0.5 ? 1.2 : 1.45;
+          this.enemyShotTimer =
+            (boss.bossVariant === 0 ? 1.35 : 1.05) *
+            (healthRatio < 0.5 ? 0.82 : 1);
         } else {
+          const encounter = Math.max(0, Math.floor(this.waveIndex / 5) - 1);
+          const bossShotSpeed = shotSpeed + 20 + Math.min(encounter, 4) * 12;
           this.enemyProjectiles.push(
             ...createEnemyVolley(
               boss,
               this.player.position,
-              shotSpeed + 20,
+              bossShotSpeed,
               this.bossAttackIndex,
             ),
           );
           this.bossAttackIndex += 1;
-          this.enemyShotTimer = healthRatio < 0.5 ? 0.72 : 0.95;
+          const attackInterval =
+            boss.bossVariant === 0 ? 0.92 : 0.78;
+          this.enemyShotTimer =
+            attackInterval *
+            (healthRatio < 0.5 ? 0.76 : 1) *
+            Math.max(0.72, 1 - encounter * 0.05);
         }
       } else {
         const shooter = this.enemies[Math.floor(Math.random() * this.enemies.length)];
@@ -349,14 +360,21 @@ export class GameEngine {
           ),
         );
         this.enemyAttackIndex += 1;
+        const difficultyReduction = Math.min(0.28, this.waveIndex * 0.02);
         if (shooter.kind === "armored") {
-          this.enemyShotTimer = 1.05 + Math.random() * 0.25;
+          this.enemyShotTimer = Math.max(
+            0.68,
+            1.05 + Math.random() * 0.25 - difficultyReduction,
+          );
         } else if (shooter.kind === "diver") {
-          this.enemyShotTimer = 0.72 + Math.random() * 0.2;
+          this.enemyShotTimer = Math.max(
+            0.48,
+            0.72 + Math.random() * 0.2 - difficultyReduction,
+          );
         } else {
           this.enemyShotTimer = Math.max(
-            0.42,
-            0.72 + Math.random() * 0.28 - this.waveIndex * 0.02,
+            0.36,
+            0.72 + Math.random() * 0.28 - difficultyReduction,
           );
         }
       }

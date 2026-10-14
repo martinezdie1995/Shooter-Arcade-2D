@@ -85,24 +85,56 @@ export function createEnemyVolley(
   let trackingTarget = false;
 
   if (enemy.kind === "boss") {
+    if (enemy.bossVariant === 0) {
+      switch (attackIndex % 5) {
+        case 0:
+          offsets = [0];
+          projectileSpeed += 25;
+          break;
+        case 1:
+          offsets = [-0.38, 0, 0.38];
+          break;
+        case 2:
+          offsets = [-0.62, 0, 0.62];
+          projectileSpeed = Math.max(150, speed - 35);
+          break;
+        default:
+          offsets = [-0.52, 0.52];
+          break;
+      }
+      const sweep = attackIndex % 5 === 2 ? Math.sin(attackIndex * 0.8) * 0.22 : 0;
+      return offsets.map((offset) =>
+        createEnemyProjectile(enemy, aimedAngle + offset + sweep, projectileSpeed),
+      );
+    }
+
     switch (attackIndex % 4) {
       case 0:
         offsets = [0];
-        projectileSpeed += 20;
+        projectileSpeed = Math.max(145, speed * 0.72);
+        trackingTarget = true;
         break;
       case 1:
-        offsets = [-0.42, 0, 0.42];
+        offsets = [-0.52, 0.52];
+        projectileSpeed = Math.max(145, speed - 25);
         break;
       case 2:
-        offsets = [-0.62, 0, 0.62];
+        offsets = [-0.78, 0, 0.78];
+        projectileSpeed = Math.max(160, speed - 15);
         break;
       default:
-        offsets = [-0.3, 0.3];
+        offsets = [0];
+        projectileSpeed += 55;
         break;
     }
-    const sweep = attackIndex % 4 === 2 ? Math.sin(attackIndex * 0.8) * 0.3 : 0;
+
     return offsets.map((offset) =>
-      createEnemyProjectile(enemy, aimedAngle + offset + sweep, projectileSpeed),
+      createEnemyProjectile(
+        enemy,
+        aimedAngle + offset,
+        projectileSpeed,
+        trackingTarget,
+      ),
     );
   }
 

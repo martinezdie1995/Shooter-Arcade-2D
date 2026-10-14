@@ -44,14 +44,14 @@
   avanzan, intercambian posiciones y formaciones serpenteantes.
 - Los enemigos normales usan cajas de render y colisión de 48×32 px; la nave del jugador
   usa una caja algo mayor de 54×36 px. Los jefes conservan su tamaño especial de 150×138 px.
-  Cada sprite mantiene
-  su proporción original. Las bajadas de enemigos normales y de oleadas especiales son
+  Los sprites de jugador mantienen su proporción y normalizan el eje largo a la misma escala
+  aunque estén girados. Las bajadas de enemigos normales y de oleadas especiales son
   cíclicas y están limitadas antes de la línea del jugador.
 - Power-up usa el sprite `src/assets/power up.png` con hitbox cuadrada de 32×32 px.
 - Las oleadas de jefe alternan los sprites `boss0.png` y `boss1.png`.
-- El jefe tiene 200 puntos de vida y movimiento rápido con salvas acotadas de hasta tres proyectiles;
-  alterna ciclos de ataque con pausas para respirar y mantiene un ritmo algo más rápido
-  cuando queda por debajo de la mitad de vida.
+- Los jefes alternan entre dos estilos: uno barre la pantalla con abanicos y el otro combina
+  disparos lentos perseguidores, cruces y disparos rectos rápidos; también tienen movimientos
+  distintos. Vida, velocidad y cadencia escalan en sus reapariciones.
 - Juego titulado `Level One`; sin barras de vida sobre enemigos. La cadencia y velocidad
   de disparo enemigo aumentan por oleada; el jefe alterna disparos dirigidos y abanicos,
   y tiene más resistencia. Incluye efectos de sonido y secuencia de muerte del jugador.
@@ -68,8 +68,9 @@
 - Al pausar, la pista activa de juego se desvanece y se usa `intro music.mp3` como tema
   tranquilo de pausa; al reanudar vuelve la música del nivel o del jefe.
 - Música al volumen máximo y efectos de sonido atenuados.
-- La dificultad sube con enemigos más veloces y disparos algo más frecuentes; el jefe
-  se mueve más rápido y acelera sus ráfagas en fase crítica.
+- La dificultad aumenta por oleada con enemigos más veloces y resistentes, proyectiles más
+  rápidos y mayor cadencia; los jefes ganan vida, velocidad y ritmo de ataque en reapariciones
+  posteriores y aceleran sus ataques en fase crítica.
 - Solo los jefes muestran una barra de salud en canvas, debajo de su sprite. Los sprites
   de naves y enemigos conservan su proporción dentro de sus cajas de render; el jugador
   usa `src/assets/shot.png` y los enemigos `src/assets/shot-enemy.png`, rotados según
