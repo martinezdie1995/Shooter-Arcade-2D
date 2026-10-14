@@ -318,6 +318,14 @@ body {
   object-fit: contain;
 }
 
+.ship-card-image img.ship-card-sprite-rotated {
+  width: 64px;
+  max-width: 100%;
+  height: auto;
+  max-height: 64px;
+  transform: rotate(-90deg);
+}
+
 .ship-card-name {
   color: #ccfbf1;
   font-size: 14px;

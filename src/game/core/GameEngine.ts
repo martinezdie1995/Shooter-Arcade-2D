@@ -258,8 +258,17 @@ export class GameEngine {
     });
 
     this.enemyProjectiles = this.enemyProjectiles.filter((projectile) => {
-      updateProjectile(projectile, dt);
-      return projectile.position.y > -30 && projectile.position.y < GAME_HEIGHT + 30;
+      updateProjectile(
+        projectile,
+        dt,
+        projectile.trackingTarget ? this.player.position : undefined,
+      );
+      return (
+        projectile.position.x > -30 &&
+        projectile.position.x < GAME_WIDTH + 30 &&
+        projectile.position.y > -30 &&
+        projectile.position.y < GAME_HEIGHT + 30
+      );
     });
 
     if (this.playerDeathTimer <= 0) {
@@ -313,21 +322,21 @@ export class GameEngine {
       const shotSpeed = 230 + Math.min(this.waveIndex * 9, 155);
       if (boss) {
         const healthRatio = boss.hp / boss.maxHp;
-        const attackIndex = this.bossAttackIndex % 6;
-        if (attackIndex === 5) {
+        const attackIndex = this.bossAttackIndex % 4;
+        if (attackIndex === 3) {
           this.bossAttackIndex += 1;
-          this.enemyShotTimer = healthRatio < 0.5 ? 1.05 : 1.25;
+          this.enemyShotTimer = healthRatio < 0.5 ? 1.2 : 1.45;
         } else {
           this.enemyProjectiles.push(
             ...createEnemyVolley(
               boss,
               this.player.position,
-              shotSpeed + 50,
+              shotSpeed + 20,
               this.bossAttackIndex,
             ),
           );
           this.bossAttackIndex += 1;
-          this.enemyShotTimer = healthRatio < 0.5 ? 0.42 : 0.62;
+          this.enemyShotTimer = healthRatio < 0.5 ? 0.72 : 0.95;
         }
       } else {
         const shooter = this.enemies[Math.floor(Math.random() * this.enemies.length)];
@@ -340,10 +349,16 @@ export class GameEngine {
           ),
         );
         this.enemyAttackIndex += 1;
-        this.enemyShotTimer = Math.max(
-          0.22,
-          0.58 + Math.random() * 0.42 - this.waveIndex * 0.035,
-        );
+        if (shooter.kind === "armored") {
+          this.enemyShotTimer = 1.05 + Math.random() * 0.25;
+        } else if (shooter.kind === "diver") {
+          this.enemyShotTimer = 0.72 + Math.random() * 0.2;
+        } else {
+          this.enemyShotTimer = Math.max(
+            0.42,
+            0.72 + Math.random() * 0.28 - this.waveIndex * 0.02,
+          );
+        }
       }
     }
 

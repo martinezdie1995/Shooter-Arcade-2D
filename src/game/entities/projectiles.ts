@@ -52,6 +52,7 @@ export function createEnemyProjectile(
   enemy: Enemy,
   angle = 0,
   speed = ENEMY_PROJECTILE_SPEED,
+  trackingTarget = false,
 ): Projectile {
   return {
     position: {
@@ -63,6 +64,7 @@ export function createEnemyProjectile(
       x: Math.sin(angle) * speed,
       y: Math.cos(angle) * speed,
     },
+    trackingTarget,
     fromPlayer: false,
   };
 }
@@ -79,40 +81,43 @@ export function createEnemyVolley(
   );
   let offsets: number[];
   let projectileSpeed = speed;
+  let trackingTarget = false;
 
   if (enemy.kind === "boss") {
-    switch (attackIndex % 5) {
+    switch (attackIndex % 4) {
       case 0:
         offsets = [0];
-        projectileSpeed += 45;
+        projectileSpeed += 20;
         break;
       case 1:
-        offsets = [-0.72, -0.36, 0, 0.36, 0.72];
+        offsets = [-0.42, 0, 0.42];
         break;
       case 2:
-        offsets = [-0.95, -0.62, -0.29, 0.04, 0.37, 0.7, 1.03];
-        break;
-      case 3:
-        offsets = [-0.42, 0.42];
-        projectileSpeed += 25;
+        offsets = [-0.62, 0, 0.62];
         break;
       default:
-        offsets = [-0.55, -0.28, 0, 0.28, 0.55];
+        offsets = [-0.3, 0.3];
         break;
     }
-    const sweep = attackIndex % 5 === 2 ? Math.sin(attackIndex * 0.8) * 0.3 : 0;
+    const sweep = attackIndex % 4 === 2 ? Math.sin(attackIndex * 0.8) * 0.3 : 0;
     return offsets.map((offset) =>
       createEnemyProjectile(enemy, aimedAngle + offset + sweep, projectileSpeed),
     );
   }
 
   if (enemy.kind === "armored") {
-    offsets = attackIndex % 2 === 0 ? [-0.34, 0, 0.34] : [-0.55, 0, 0.55];
+    offsets = attackIndex % 2 === 0 ? [-0.48, 0, 0.48] : [-0.7, 0, 0.7];
+    projectileSpeed = Math.max(110, speed - 70);
   } else if (enemy.kind === "diver") {
-    offsets = attackIndex % 3 === 2 ? [-0.16, 0, 0.16] : [0];
-    projectileSpeed += 35;
+    trackingTarget = attackIndex % 3 === 0;
+    offsets = trackingTarget
+      ? [0]
+      : attackIndex % 2 === 0
+        ? [-0.16, 0.16]
+        : [0];
+    projectileSpeed = trackingTarget ? Math.max(125, speed - 30) : speed + 35;
   } else {
-    offsets = attackIndex % 4 === 3 ? [-0.24, 0, 0.24] : [0];
+    offsets = attackIndex % 3 === 2 ? [-0.24, 0, 0.24] : [0];
   }
 
   return offsets.map((offset) =>
@@ -120,11 +125,35 @@ export function createEnemyVolley(
       enemy,
       (enemy.kind === "basic" && offsets.length === 1 ? 0 : aimedAngle) + offset,
       projectileSpeed,
+      trackingTarget,
     ),
   );
 }
 
-export function updateProjectile(projectile: Projectile, dt: number): void {
+export function updateProjectile(
+  projectile: Projectile,
+  dt: number,
+  target?: Vec2,
+): void {
+  if (projectile.trackingTarget && target) {
+    const speed = Math.hypot(projectile.velocity.x, projectile.velocity.y);
+    if (speed > 0) {
+      const currentAngle = Math.atan2(projectile.velocity.y, projectile.velocity.x);
+      const targetAngle = Math.atan2(
+        target.y - projectile.position.y,
+        target.x - projectile.position.x,
+      );
+      const angleDifference = Math.atan2(
+        Math.sin(targetAngle - currentAngle),
+        Math.cos(targetAngle - currentAngle),
+      );
+      const turn = Math.max(-1.8 * dt, Math.min(1.8 * dt, angleDifference));
+      const nextAngle = currentAngle + turn;
+      projectile.velocity.x = Math.cos(nextAngle) * speed;
+      projectile.velocity.y = Math.sin(nextAngle) * speed;
+    }
+  }
+
   projectile.position.x += projectile.velocity.x * dt;
   projectile.position.y += projectile.velocity.y * dt;
 }

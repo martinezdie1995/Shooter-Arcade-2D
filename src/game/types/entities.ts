@@ -36,6 +36,7 @@ export interface Projectile {
   position: Vec2;
   size: Dimensions;
   velocity: Vec2;
+  trackingTarget?: boolean;
   /** De quién proviene: determina con qué colisiona. */
   fromPlayer: boolean;
 }

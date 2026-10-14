@@ -13,7 +13,13 @@ export function MainMenu({
   onStart,
 }: MainMenuProps): JSX.Element {
   return (
-    <div className="overlay main-menu">
+    <div
+      className="overlay main-menu"
+      onClick={(event) => {
+        if (event.target instanceof Element && event.target.closest("button")) return;
+        onStart();
+      }}
+    >
       <p className="menu-kicker">Arcade combat // survival</p>
       <h1 className="title title-hero" aria-label="Level One">
         <span>LEVEL</span>

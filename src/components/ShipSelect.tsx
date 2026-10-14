@@ -54,7 +54,11 @@ export function ShipSelect({
               aria-pressed={isSelected}
             >
               <span className="ship-card-image">
-                <img src={ship.spriteUrl} alt="" />
+                <img
+                  className={ship.rotated ? "ship-card-sprite-rotated" : undefined}
+                  src={ship.spriteUrl}
+                  alt=""
+                />
               </span>
               <span className="ship-card-name">{ship.name}</span>
               <span className="ship-card-class">{ship.className}</span>

@@ -42,14 +42,15 @@
   de descenso más dinámicos; sprite base fijo del jugador y variantes de enemigo;
   power-ups que mejoran carriles, disparos diagonales y cadencia; oleadas con enemigos que
   avanzan, intercambian posiciones y formaciones serpenteantes.
-- El jugador y los enemigos normales usan cajas de render y colisión compartidas de
-  48×32 px; los jefes conservan su tamaño especial de 150×138 px. Cada sprite mantiene
+- Los enemigos normales usan cajas de render y colisión de 48×32 px; la nave del jugador
+  usa una caja algo mayor de 54×36 px. Los jefes conservan su tamaño especial de 150×138 px.
+  Cada sprite mantiene
   su proporción original. Las bajadas de enemigos normales y de oleadas especiales son
   cíclicas y están limitadas antes de la línea del jugador.
 - Power-up usa el sprite `src/assets/power up.png` con hitbox cuadrada de 32×32 px.
 - Las oleadas de jefe alternan los sprites `boss0.png` y `boss1.png`.
-- El jefe tiene 200 puntos de vida y movimiento rápido con patrones de abanico/ráfaga más densos;
-  alterna ciclos de ataque con una pausa para respirar y mantiene un ritmo algo más rápido
+- El jefe tiene 200 puntos de vida y movimiento rápido con salvas acotadas de hasta tres proyectiles;
+  alterna ciclos de ataque con pausas para respirar y mantiene un ritmo algo más rápido
   cuando queda por debajo de la mitad de vida.
 - Juego titulado `Level One`; sin barras de vida sobre enemigos. La cadencia y velocidad
   de disparo enemigo aumentan por oleada; el jefe alterna disparos dirigidos y abanicos,
@@ -73,8 +74,9 @@
   de naves y enemigos conservan su proporción dentro de sus cajas de render; el jugador
   usa `src/assets/shot.png` y los enemigos `src/assets/shot-enemy.png`, rotados según
   la dirección de cada proyectil.
-- Los ataques alternan entre disparos dirigidos, abanicos y ráfagas según el tipo de enemigo;
-  los jefes agregan barridos y pausas entre secuencias.
+- Los ataques varían por tipo: básicos disparan recto o en abanico, buzos lanzan proyectiles
+  perseguidores o ráfagas rápidas, y blindados disparan abanicos lentos; el jefe combina
+  salvas reducidas con barridos y pausas entre secuencias.
 - La aparición del jefe anuncia peligro durante 2,8 segundos con alerta pulsante y temblor
   visual decreciente; la música de la pelea continúa durante la presentación.
 - HUD, pausa y pantalla de fin de partida usan tipografía arcade condensada, contraste
@@ -85,9 +87,11 @@
 - Al reiniciar después de perder, se cancela la secuencia de audio game-over/puntuación.
 - Al comenzar una partida, el input táctil inicial se limpia para conservar la posición
   predeterminada inferior de la nave.
-- El hangar previo al inicio permite elegir entre tres naves con velocidades, cadencias y
-  vidas iniciales distintas; sus sprites/disparos se ajustan al marco existente de 48×32 px
-  y sus configuraciones viven en `game/entities/playerShips.ts`.
+- El menú continúa al hangar con un toque en cualquier área fuera de sus botones y conserva
+  la música del menú durante la selección. Las tres naves del hangar se muestran orientadas
+  verticalmente. El hangar previo al inicio permite elegir entre tres naves con velocidades,
+  cadencias y vidas iniciales distintas; la caja de render del jugador es de 54×36 px y sus
+  configuraciones viven en `game/entities/playerShips.ts`.
 - Durante cada pelea de jefe pueden caer power-ups de evolución cada 8–11 segundos;
   aparecen mejoras de vida ocasionales durante la partida, con un máximo de cinco vidas.
 - Build verificado con `npm run build` sin errores.
